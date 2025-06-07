@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PilaController : MonoBehaviour
 {
-   public float cantidadRecargaBateria = 25f;
+   public float cantidadRecargaBateria = 20f;
 
     public RoombaScript roomba;
     private SoundController soundController;
