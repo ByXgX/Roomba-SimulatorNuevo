@@ -9,18 +9,18 @@ public class RoombaScript : MonoBehaviour
     public float speed = 3f;
     public float rotationSpeed = 100f;
     public TextMeshProUGUI moneyText;
-    public int money = 50;
-    public int points = 0;
+    public float money = 50;
+    public float points = 0;
     public float bateriaMax = 100f;
     public float bateriaActual = 100f;
     public float maxHeal = 100f;
     public float currHeal;
     public float perdidaBateriaPorDistancia = 0.1f;
-    private Vector3 posicionAnterior;
+    //private Vector3 posicionAnterior;
     public bool sePuedeMover = true;
 
     //---------------- win ------------------
-    public int puntosGanar = 12500;
+    public float puntosGanar = 12500;
     public GameObject winScreenPanel;
     //---------- jetpack --------
     public float maxFuel = 50f;
@@ -28,7 +28,7 @@ public class RoombaScript : MonoBehaviour
     public float jForce = 0.5f;
     public Rigidbody rb;
     public Transform groundTransform;
-    public ParticleSystem effect;
+    //public ParticleSystem effect;
     public bool hasJetpack = false;
     private bool jumpInputHeld; //poner en 10 y max 12
 
@@ -42,6 +42,15 @@ public class RoombaScript : MonoBehaviour
     public Slider batteryUI;
     public Slider fuelUI;
     public Slider healthUI;
+
+    //------------------------- powerUp --------------------
+
+    private float pointMultiplier = 1f;       
+    private Coroutine puntosX2Coroutine;
+    public GameObject powerUpBox;
+    public TextMeshProUGUI powerUpTime;
+    private float powerUpTimeRemaining;
+    private bool isPowerUp = false;
 
     //------------sonidos--------------------
 
@@ -73,11 +82,15 @@ public class RoombaScript : MonoBehaviour
     }
     void Start()
     {
-        posicionAnterior = transform.position;
+        //posicionAnterior = transform.position;
         currFuel = maxFuel;
         if (deathScreenPanel != null)
         {
             deathScreenPanel.SetActive(false);
+        }
+        if (powerUpBox != null)
+        {
+            powerUpBox.SetActive(false);
         }
         soundController = FindFirstObjectByType<SoundController>();
         originalColor = playerRenderer.material.color;
@@ -98,6 +111,12 @@ public class RoombaScript : MonoBehaviour
         jumpInputHeld = Input.GetAxis("Jump") > 0f;
         UpdateSlider();
         moneyText.text = "Money: " + money.ToString();
+        powerUpTimeRemaining -= Time.deltaTime;
+        if (powerUpTimeRemaining < 0)
+        {
+            powerUpTimeRemaining = 0;
+        }
+        UpdatePowerUp();
         if (points >= puntosGanar)
         {
             GanarJuego();
@@ -157,11 +176,11 @@ public class RoombaScript : MonoBehaviour
                     currFuel -= Time.fixedDeltaTime;
                     rb.AddForce(Vector3.up * jForce, ForceMode.Acceleration);
 
-                    if (effect != null && !effect.isPlaying) effect.Play();
+                    //if (effect != null && !effect.isPlaying) effect.Play();
                 }
                 else
                 {
-                    if (effect != null && effect.isPlaying) effect.Stop();
+                    //if (effect != null && effect.isPlaying) effect.Stop();
 
 
                     bool isGrounded = Physics.Raycast(groundTransform.position, Vector3.down, 0.2f, LayerMask.GetMask("Grounded"));
@@ -177,10 +196,69 @@ public class RoombaScript : MonoBehaviour
         {
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            if (effect != null && effect.isPlaying) effect.Stop();
+            //if (effect != null && effect.isPlaying) effect.Stop();
             soundController.DetenerAudio();
         }
         currFuel = Mathf.Clamp(currFuel, 0f, maxFuel);
+    }
+
+    //--------------- x2 -------------------
+    
+    public void ActivatePuntosPowerUp(float duration, float multiplierValue)
+    {
+        if (puntosX2Coroutine != null)
+        {
+            StopCoroutine(puntosX2Coroutine);
+        }
+        puntosX2Coroutine = StartCoroutine(PuntosX2PowerUp(duration, multiplierValue));
+    }
+
+    // --- CORRUTINA  ---
+    System.Collections.IEnumerator PuntosX2PowerUp(float duration, float multiplierValue)
+    {
+        pointMultiplier = multiplierValue;
+        isPowerUp = true;
+        powerUpTimeRemaining = duration;
+        
+        if (powerUpBox != null)
+        {
+            powerUpBox.SetActive(true);
+        }
+
+        while (powerUpTimeRemaining > 0)
+        {
+            yield return null;
+        }
+
+        //yield return new WaitForSeconds(duration); 
+        pointMultiplier = 1f;
+        isPowerUp = false;
+        if (powerUpBox != null)
+        {
+            powerUpBox.SetActive(false);
+        }
+
+        puntosX2Coroutine = null;
+    }
+
+    void UpdatePowerUp()
+    {
+        if (powerUpTime != null)
+        {
+            int seconds = Mathf.CeilToInt(powerUpTimeRemaining);
+            powerUpTime.text = "x2: " + seconds.ToString() + " sec";
+        }
+    }
+
+    public float GetCurrentPointMultiplier()
+    {
+        return pointMultiplier;
+    }
+
+    public void AddPointsAndMoney(int basePointsToAdd, int baseMoneyToAdd)
+    {
+        points += basePointsToAdd * pointMultiplier;
+        money += baseMoneyToAdd * pointMultiplier;
     }
 
     //-------------vida--------------
