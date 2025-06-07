@@ -20,7 +20,7 @@ public class RoombaScript : MonoBehaviour
     public bool sePuedeMover = true;
 
     //---------------- win ------------------
-    public float puntosGanar = 12500;
+    public float puntosGanar = 14500;
     public GameObject winScreenPanel;
     //---------- jetpack --------
     public float maxFuel = 50f;
@@ -49,6 +49,7 @@ public class RoombaScript : MonoBehaviour
     private Coroutine puntosX2Coroutine;
     public GameObject powerUpBox;
     public TextMeshProUGUI powerUpTime;
+    public TextMeshProUGUI powerUpTimeBlan;
     private float powerUpTimeRemaining;
     private bool isPowerUp = false;
 
@@ -247,6 +248,7 @@ public class RoombaScript : MonoBehaviour
         {
             int seconds = Mathf.CeilToInt(powerUpTimeRemaining);
             powerUpTime.text = "x2: " + seconds.ToString() + " sec";
+            powerUpTimeBlan.text = "x2: " + seconds.ToString() + " sec";
         }
     }
 

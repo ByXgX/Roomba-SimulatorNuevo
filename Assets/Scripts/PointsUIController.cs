@@ -5,7 +5,9 @@ public class PointsUIController : MonoBehaviour
 {
     [SerializeField] private RoombaScript roomba; 
     [SerializeField] private TMP_Text textoPuntos;
+    [SerializeField] private TMP_Text textoPuntosBlan;
     [SerializeField] private TMP_Text textoDinero;
+    [SerializeField] private TMP_Text textoDineroBlan;
     [SerializeField] private TMP_Text textoStats;
     private string jet;
 
@@ -17,11 +19,14 @@ public class PointsUIController : MonoBehaviour
         }
         if (roomba != null && textoPuntos != null)
         {
-            textoPuntos.text = "Points: " + roomba.points.ToString();
+            textoPuntos.text = "Points: " + roomba.points.ToString() + " / 14500";
+            textoPuntosBlan.text = "Points: " + roomba.points.ToString()+ " / 14500";
+
         }
         if (roomba != null && textoDinero != null)
         {
             textoDinero.text = "Money: " + roomba.money.ToString();
+            textoDineroBlan.text = "Money: " + roomba.money.ToString();
         }
         if (roomba != null && textoStats != null)
         {

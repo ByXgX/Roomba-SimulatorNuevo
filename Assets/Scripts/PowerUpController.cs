@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PowerUpController : MonoBehaviour
 {
-    public float duration = 60f;   
+    public float duration = 15f;   
     public float value = 2f;
 
     private SoundController soundController;
