@@ -2,21 +2,33 @@ using UnityEngine;
 
 public class PilaController : MonoBehaviour
 {
-   public float cantidadRecargaBateria = 20f;
-
-    public RoombaScript roomba;
+    public float cantidadRecargaBateria = 20f;
     private SoundController soundController;
 
     void Start()
     {
         soundController = FindFirstObjectByType<SoundController>();
     }
+
     private void OnTriggerEnter(Collider other)
     {
-        roomba = other.GetComponent<RoombaScript>();
-        roomba.RecargarBateria(cantidadRecargaBateria);
-        soundController.SeleccionAudio(6, 0.8f, false);
-        Destroy(this.gameObject);
+        if (other.CompareTag("Player")) 
+        {
+            RoombaScript detectedRoomba = other.GetComponent<RoombaScript>();
+
+            if (detectedRoomba != null)
+            {
+                detectedRoomba.RecargarBateria(cantidadRecargaBateria); 
+
+                if (soundController != null)
+                {
+                    soundController.SeleccionAudio(6, 0.8f, false);
+                }
+                
+                Destroy(this.gameObject); 
+            }
+           
+        }
     }
 
 }
