@@ -79,10 +79,6 @@ public class RoombaScript : MonoBehaviour
         {
             deathScreenPanel.SetActive(false);
         }
-        if (winScreenPanel != null) 
-        {
-            winScreenPanel.SetActive(false);
-        }
         soundController = FindFirstObjectByType<SoundController>();
         originalColor = playerRenderer.material.color;
         sePuedeMover = true;
