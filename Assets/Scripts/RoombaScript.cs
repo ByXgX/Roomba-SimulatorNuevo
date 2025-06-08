@@ -38,6 +38,7 @@ public class RoombaScript : MonoBehaviour
     //public ParticleSystem effect;
     public bool hasJetpack = false;
     private bool jumpInputHeld; //poner en 10 y max 12
+    private bool isJetpackSoundPlaying = false;
 
     //--------------Die--------------
     public Renderer playerRenderer;
@@ -182,8 +183,6 @@ public class RoombaScript : MonoBehaviour
         }
         batteryWarning.transform.localScale = originalScale;
     }
-
-
     void FixedUpdate()
     {
         if (sePuedeMover)
@@ -208,7 +207,6 @@ public class RoombaScript : MonoBehaviour
                 soundController.DetenerAudio();
                 reproduciendoSonido = false;
             }
-
             // --- Pérdida de Bateria Útil ---
             if (rb.linearVelocity.magnitude > 0.01f)
             {
@@ -235,12 +233,18 @@ public class RoombaScript : MonoBehaviour
                 {
                     currFuel -= Time.fixedDeltaTime;
                     rb.AddForce(Vector3.up * jForce, ForceMode.Acceleration);
-                    if (hasJetpack==true) {
-                        soundController.SeleccionAudio(11,0.4f,true);
+                    if (soundController != null)
+                    {
+                        soundController.SeleccionAudio(11, 0.4f, true);
                     }
                 }
                 else
                 {
+                    if (soundController != null && isJetpackSoundPlaying)
+                    {
+                        soundController.DetenerAudioPorIndice(11); 
+                        isJetpackSoundPlaying = false;
+                    }
                     bool isGrounded = Physics.Raycast(groundTransform.position, Vector3.down, 0.2f, LayerMask.GetMask("Grounded"));
 
                     if (isGrounded && currFuel < maxFuel)
@@ -297,7 +301,6 @@ public class RoombaScript : MonoBehaviour
 
         puntosX2Coroutine = null;
     }
-
     void UpdatePowerUp()
     {
         if (powerUpTime != null)
@@ -307,12 +310,10 @@ public class RoombaScript : MonoBehaviour
             powerUpTimeBlan.text = "x2: " + seconds.ToString() + " sec";
         }
     }
-
     public float GetCurrentPointMultiplier()
     {
         return pointMultiplier;
     }
-
     public void AddPointsAndMoney(int basePointsToAdd, int baseMoneyToAdd)
     {
         points += basePointsToAdd * pointMultiplier;
@@ -325,6 +326,7 @@ public class RoombaScript : MonoBehaviour
 
         Vida -= cantidad;
         playerRenderer.material.color = damageColor;
+        soundController.SeleccionAudio(8,0.8f,false);
         Invoke("ResetColor", 0.2f);
 
         if (Vida <= 0)

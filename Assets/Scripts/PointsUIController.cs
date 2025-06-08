@@ -19,8 +19,8 @@ public class PointsUIController : MonoBehaviour
         }
         if (roomba != null && textoPuntos != null)
         {
-            textoPuntos.text = "Points: " + roomba.points.ToString() + " / 14500";
-            textoPuntosBlan.text = "Points: " + roomba.points.ToString()+ " / 14500";
+            textoPuntos.text = "Points: " + roomba.points.ToString() + " / 15000";
+            textoPuntosBlan.text = "Points: " + roomba.points.ToString()+ " / 15000";
 
         }
         if (roomba != null && textoDinero != null)
