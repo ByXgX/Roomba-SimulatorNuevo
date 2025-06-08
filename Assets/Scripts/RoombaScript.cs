@@ -28,7 +28,9 @@ public class RoombaScript : MonoBehaviour
     private Coroutine pulsateCoroutine;
 
     //---------------- win ------------------
-    public float puntosGanar = 14500;
+    public float puntosGanar = 17000;
+    public GameObject canWin;
+
     //---------- jetpack --------
     public float maxFuel = 50f;
     public float currFuel;
@@ -39,6 +41,7 @@ public class RoombaScript : MonoBehaviour
     public bool hasJetpack = false;
     private bool jumpInputHeld; //poner en 10 y max 12
     private bool isJetpackSoundPlaying = false;
+    private bool isUsingJetpack = false;
 
     //--------------Die--------------
     public Renderer playerRenderer;
@@ -105,6 +108,9 @@ public class RoombaScript : MonoBehaviour
         {
             batteryWarning.SetActive(false);
         }
+        if (canWin != null) {
+            canWin.SetActive(false);
+        }
         soundController = FindFirstObjectByType<SoundController>();
         originalColor = playerRenderer.material.color;
         sePuedeMover = true;
@@ -135,7 +141,7 @@ public class RoombaScript : MonoBehaviour
         UpdatePowerUp();
         if (points >= puntosGanar)
         {
-            
+            canWin.SetActive(true);
         }
         if (points >= puntosGanar && Input.GetKey(KeyCode.C))
         {
@@ -229,34 +235,44 @@ public class RoombaScript : MonoBehaviour
                 rotationInput = -1f;
             }
             transform.Rotate(Vector3.up * rotationInput * rotationSpeed * Time.fixedDeltaTime);
+            //-------------------- Jetpack ----------------------
 
-            if (hasJetpack)
+             bool isGrounded = Physics.Raycast(groundTransform.position, Vector3.down, 0.2f, LayerMask.GetMask("Grounded"));
+
+            if (jumpInputHeld && currFuel > 0f)
             {
-                // --- Lógica del Jetpack  ---
-                if (jumpInputHeld && currFuel > 0f)
+                currFuel -= Time.fixedDeltaTime;
+                rb.AddForce(Vector3.up * jForce, ForceMode.Acceleration);
+
+                isUsingJetpack = true;
+
+                if (soundController != null && !isJetpackSoundPlaying)
                 {
-                    currFuel -= Time.fixedDeltaTime;
-                    rb.AddForce(Vector3.up * jForce, ForceMode.Acceleration);
-                    if (soundController != null)
-                    {
-                        soundController.SeleccionAudio(11, 0.4f, true);
-                    }
+                    soundController.SeleccionAudio(11, 0.4f, true); // loop activado
+                    isJetpackSoundPlaying = true;
                 }
-                else
+            }
+            else
+            {
+                // Si está en el aire, seguimos el sonido hasta que toque el suelo
+                if (isGrounded)
                 {
+                    isUsingJetpack = false;
+
                     if (soundController != null && isJetpackSoundPlaying)
                     {
-                        soundController.DetenerAudioPorIndice(11); 
+                        soundController.DetenerAudioPorIndice(11);
                         isJetpackSoundPlaying = false;
                     }
-                    bool isGrounded = Physics.Raycast(groundTransform.position, Vector3.down, 0.2f, LayerMask.GetMask("Grounded"));
 
-                    if (isGrounded && currFuel < maxFuel)
+                    // recargar combustible solo si toca suelo
+                    if (currFuel < maxFuel)
                     {
                         currFuel += Time.fixedDeltaTime;
                     }
                 }
             }
+
         }
         else
         {
