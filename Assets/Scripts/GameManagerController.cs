@@ -19,12 +19,9 @@ public class GameManagerController : MonoBehaviour
 
     void Awake()
     {
-        // Implementación del Singleton
         if (Instance == null)
         {
             Instance = this;
-            // No destruir este objeto al cargar nuevas escenas si quieres un GameManager persistente
-            // DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -34,7 +31,6 @@ public class GameManagerController : MonoBehaviour
 
     void Start()
     {
-        // Asegúrate de que el menú de pausa esté oculto al inicio
         if (pauseMenuPanel != null)
         {
             pauseMenuPanel.SetActive(false);

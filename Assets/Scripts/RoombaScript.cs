@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,10 +19,16 @@ public class RoombaScript : MonoBehaviour
     public float perdidaBateriaPorDistancia = 0.1f;
     //private Vector3 posicionAnterior;
     public bool sePuedeMover = true;
+    public float porcentajeBateria;
+    public GameObject batteryWarning;
+    public float scaleFactor = 1.5f;
+    public float animationSpeed = 1.5f;
+    public Vector3 originalScale;
+    private bool lowBatteryAlertActive = false;
+    private Coroutine pulsateCoroutine;
 
     //---------------- win ------------------
     public float puntosGanar = 14500;
-    public GameObject winScreenPanel;
     //---------- jetpack --------
     public float maxFuel = 50f;
     public float currFuel;
@@ -93,9 +100,17 @@ public class RoombaScript : MonoBehaviour
         {
             powerUpBox.SetActive(false);
         }
+        if (batteryWarning != null)
+        {
+            batteryWarning.SetActive(false);
+        }
         soundController = FindFirstObjectByType<SoundController>();
         originalColor = playerRenderer.material.color;
         sePuedeMover = true;
+        if (batteryWarning != null)
+        {
+            originalScale = batteryWarning.transform.localScale;
+        }
     }
 
     void Awake()
@@ -104,7 +119,6 @@ public class RoombaScript : MonoBehaviour
         currFuel = maxFuel;
         Vida = maxHeal;
         bateriaActual = bateriaMax;
-        
     }
 
     void Update()
@@ -122,7 +136,53 @@ public class RoombaScript : MonoBehaviour
         {
             GanarJuego();
         }
+        porcentajeBateria = (bateriaActual / bateriaMax) * 100f;
+        if (porcentajeBateria < 20f)
+        {
+            batteryWarning.SetActive(true);
+            if (!lowBatteryAlertActive) 
+            {
+                lowBatteryAlertActive = true;
+                if (batteryWarning != null)
+                {
+                    batteryWarning.SetActive(true);
+                    pulsateCoroutine = StartCoroutine(PulsateWarningImage());
+                }
+            } else {
+                if (lowBatteryAlertActive)
+                {
+                    lowBatteryAlertActive = false;
+
+                    if (pulsateCoroutine != null)
+                    {
+                        StopCoroutine(pulsateCoroutine);
+                        pulsateCoroutine = null;
+                    }
+
+                    if (batteryWarning != null)
+                    {
+                        batteryWarning.transform.localScale = originalScale;
+                        batteryWarning.SetActive(false);
+                    }
+                }
+            }
+        }
     }
+    IEnumerator PulsateWarningImage()
+    {
+        if (batteryWarning == null) yield break;
+        batteryWarning.transform.localScale = originalScale;
+        float timer = 0f;
+        while (lowBatteryAlertActive)
+        {
+            timer += Time.deltaTime * animationSpeed;
+            float scale = Mathf.Lerp(1f, scaleFactor, (Mathf.Sin(timer) + 1f) / 2f);
+            batteryWarning.transform.localScale = originalScale * scale;
+            yield return null;
+        }
+        batteryWarning.transform.localScale = originalScale;
+    }
+
 
     void FixedUpdate()
     {
@@ -170,20 +230,17 @@ public class RoombaScript : MonoBehaviour
 
             if (hasJetpack)
             {
-
                 // --- Lógica del Jetpack  ---
                 if (jumpInputHeld && currFuel > 0f)
                 {
                     currFuel -= Time.fixedDeltaTime;
                     rb.AddForce(Vector3.up * jForce, ForceMode.Acceleration);
-
-                    //if (effect != null && !effect.isPlaying) effect.Play();
+                    if (hasJetpack==true) {
+                        soundController.SeleccionAudio(11,0.4f,true);
+                    }
                 }
                 else
                 {
-                    //if (effect != null && effect.isPlaying) effect.Stop();
-
-
                     bool isGrounded = Physics.Raycast(groundTransform.position, Vector3.down, 0.2f, LayerMask.GetMask("Grounded"));
 
                     if (isGrounded && currFuel < maxFuel)
@@ -197,7 +254,6 @@ public class RoombaScript : MonoBehaviour
         {
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            //if (effect != null && effect.isPlaying) effect.Stop();
             soundController.DetenerAudio();
         }
         currFuel = Mathf.Clamp(currFuel, 0f, maxFuel);

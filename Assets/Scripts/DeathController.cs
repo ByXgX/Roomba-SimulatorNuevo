@@ -29,7 +29,7 @@ public class DeathController : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenuScene");
+        SceneManager.LoadScene("MainMenu");
     }
      public void QuitGame()
     {

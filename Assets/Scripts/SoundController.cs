@@ -25,9 +25,28 @@ public class SoundController : MonoBehaviour
             controlAudio.PlayOneShot(audios[indice], volumen);
         }
     }
-
     public void DetenerAudio()
     {
         controlAudio.Stop();
+    }
+    public void DetenerAudioPorIndice(int indice)
+    {
+        if (indice < 0 || indice >= audios.Length)
+        {
+            return;
+        }
+        if (controlAudio.isPlaying && controlAudio.loop && controlAudio.clip == audios[indice])
+        {
+            controlAudio.Stop();
+            controlAudio.loop = false;
+        }
+    }
+     public bool IsPlayingAudio(int indice)
+    {
+        if (indice < 0 || indice >= audios.Length)
+        {
+            return false;
+        }
+        return controlAudio.isPlaying && controlAudio.loop && controlAudio.clip == audios[indice];
     }
 }
