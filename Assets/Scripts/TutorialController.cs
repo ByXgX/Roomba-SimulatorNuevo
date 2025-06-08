@@ -13,10 +13,12 @@ public class TutorialController : MonoBehaviour
     public float timePerStep = 5f; 
     private int currentStepIndex = 0;
     private Coroutine tutorialCoroutine;
+    private SoundController soundController;
+
 
     void Start()
     {
-        // Comprobaciones de seguridad
+        soundController = FindFirstObjectByType<SoundController>();
         if (tutorialUIContainer == null || tutorialInstructionText == null)
         {
             enabled = false;
@@ -42,12 +44,11 @@ public class TutorialController : MonoBehaviour
         {
             tutorialInstructionText.text = tutorialSteps[currentStepIndex];
             yield return new WaitForSeconds(timePerStep); 
-
+            soundController.SeleccionAudio(12, 0.6f, false);
             currentStepIndex++;
         }
         FinishTutorial();
     }
-
     public void FinishTutorial()
     {
         if (tutorialCoroutine != null)
@@ -59,8 +60,6 @@ public class TutorialController : MonoBehaviour
         tutorialUIContainer.SetActive(false);
 
     }
-
-
     [ContextMenu("Reset Non-Intrusive Tutorial Progress (Editor Only)")]
     void ResetTutorialProgress()
     {

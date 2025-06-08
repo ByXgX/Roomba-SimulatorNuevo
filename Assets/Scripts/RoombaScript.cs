@@ -135,6 +135,10 @@ public class RoombaScript : MonoBehaviour
         UpdatePowerUp();
         if (points >= puntosGanar)
         {
+            
+        }
+        if (points >= puntosGanar && Input.GetKey(KeyCode.C))
+        {
             GanarJuego();
         }
         porcentajeBateria = (bateriaActual / bateriaMax) * 100f;
@@ -326,7 +330,7 @@ public class RoombaScript : MonoBehaviour
 
         Vida -= cantidad;
         playerRenderer.material.color = damageColor;
-        soundController.SeleccionAudio(8,0.8f,false);
+        soundController.SeleccionAudio(8,1.5f,false);
         Invoke("ResetColor", 0.2f);
 
         if (Vida <= 0)

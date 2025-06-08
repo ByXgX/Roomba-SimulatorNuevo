@@ -21,7 +21,7 @@ public class PowerUpController : MonoBehaviour
 
                 if (soundController != null)
                 {
-                    soundController.SeleccionAudio(7, 0.7f, false); 
+                    soundController.SeleccionAudio(13, 0.7f, false); 
                 }
                 Destroy(this.gameObject);
            
