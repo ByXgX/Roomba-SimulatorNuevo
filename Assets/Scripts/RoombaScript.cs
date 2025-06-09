@@ -30,6 +30,7 @@ public class RoombaScript : MonoBehaviour
     //---------------- win ------------------
     public float puntosGanar = 17000;
     public GameObject canWin;
+    public TextMeshProUGUI winText;
 
     //---------- jetpack --------
     public float maxFuel = 50f;
@@ -68,6 +69,12 @@ public class RoombaScript : MonoBehaviour
 
     private SoundController soundController;
     bool reproduciendoSonido = false;
+
+    //------------------ crono ----------------------
+    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI timerTextBlan;
+    private float timer = 0f;
+    private bool timerRunning = false;
 
     public float Velocidad
     {
@@ -108,7 +115,8 @@ public class RoombaScript : MonoBehaviour
         {
             batteryWarning.SetActive(false);
         }
-        if (canWin != null) {
+        if (canWin != null)
+        {
             canWin.SetActive(false);
         }
         soundController = FindFirstObjectByType<SoundController>();
@@ -118,6 +126,7 @@ public class RoombaScript : MonoBehaviour
         {
             originalScale = batteryWarning.transform.localScale;
         }
+        timerRunning = true;
     }
 
     void Awake()
@@ -142,6 +151,8 @@ public class RoombaScript : MonoBehaviour
         if (points >= puntosGanar)
         {
             canWin.SetActive(true);
+            timerRunning = false;
+            winText.text = "Press c to win \n"+ FormatTime(timer);
         }
         if (points >= puntosGanar && Input.GetKey(KeyCode.C))
         {
@@ -151,7 +162,7 @@ public class RoombaScript : MonoBehaviour
         if (porcentajeBateria < 20f)
         {
             batteryWarning.SetActive(true);
-            if (!lowBatteryAlertActive) 
+            if (!lowBatteryAlertActive)
             {
                 lowBatteryAlertActive = true;
                 if (batteryWarning != null)
@@ -159,7 +170,9 @@ public class RoombaScript : MonoBehaviour
                     batteryWarning.SetActive(true);
                     pulsateCoroutine = StartCoroutine(PulsateWarningImage());
                 }
-            } else {
+            }
+            else
+            {
                 if (lowBatteryAlertActive)
                 {
                     lowBatteryAlertActive = false;
@@ -178,7 +191,26 @@ public class RoombaScript : MonoBehaviour
                 }
             }
         }
+        //------ crono ------
+
+        if (timerRunning)
+        {
+            timer += Time.deltaTime;
+            timerText.text = "Tiempo: " + FormatTime(timer);    
+            timerTextBlan.text = "Tiempo: " + FormatTime(timer);    
+        }
     }
+
+    string FormatTime(float timeToDisplay)
+    {
+        float minutes = Mathf.FloorToInt(timeToDisplay / 60);
+        float seconds = Mathf.FloorToInt(timeToDisplay % 60);
+        float milliseconds = (timeToDisplay % 1) * 1000; // Obtener milisegundos
+
+        // Formato MM:SS.mmm
+        return string.Format("{0:00}:{1:00}.{2:000}", minutes, seconds, milliseconds);
+    }
+
     IEnumerator PulsateWarningImage()
     {
         if (batteryWarning == null) yield break;
@@ -239,7 +271,7 @@ public class RoombaScript : MonoBehaviour
 
              bool isGrounded = Physics.Raycast(groundTransform.position, Vector3.down, 0.2f, LayerMask.GetMask("Grounded"));
 
-            if (jumpInputHeld && currFuel > 0f)
+            if (jumpInputHeld && currFuel > 0f && hasJetpack)
             {
                 currFuel -= Time.fixedDeltaTime;
                 rb.AddForce(Vector3.up * jForce, ForceMode.Acceleration);

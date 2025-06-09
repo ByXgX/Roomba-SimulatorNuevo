@@ -9,6 +9,7 @@ public class MainMenuController : MonoBehaviour
     public VideoPlayer videoPlayer;
     public float videoDuration = 10f;
     
+    
     public void GoToStart()
     {
         SceneManager.LoadScene("OutDoorsScene");
