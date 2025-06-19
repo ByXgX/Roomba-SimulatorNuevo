@@ -196,8 +196,8 @@ public class RoombaScript : MonoBehaviour
         if (timerRunning)
         {
             timer += Time.deltaTime;
-            timerText.text = "Tiempo: " + FormatTime(timer);    
-            timerTextBlan.text = "Tiempo: " + FormatTime(timer);    
+            timerText.text = "Time: " + FormatTime(timer);    
+            timerTextBlan.text = "Time: " + FormatTime(timer);    
         }
     }
 

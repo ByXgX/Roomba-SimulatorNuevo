@@ -10,20 +10,15 @@ public class PowerUpController : MonoBehaviour
     {
         soundController = FindFirstObjectByType<SoundController>();
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             RoombaScript roomba = null;
             roomba = other.GetComponent<RoombaScript>();
-                roomba.ActivatePuntosPowerUp(duration, value);
-
-                if (soundController != null)
-                {
-                    soundController.SeleccionAudio(13, 0.7f, false); 
-                }
-                Destroy(this.gameObject);
+            roomba.ActivatePuntosPowerUp(duration, value);
+            soundController.SeleccionAudio(13, 0.8f, false);
+            Destroy(this.gameObject);
            
         }
     }
